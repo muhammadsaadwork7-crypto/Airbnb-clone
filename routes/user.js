@@ -7,13 +7,13 @@ const { saveRediectUrl } = require("../middleware.js");
 
 const userController = require("../controllers/users.js");
 
-router.get("/signup",userController.renderSignupForm);
+router.route("/signup")
+.get(userController.renderSignupForm)
+.post(wrapAsync(userController.signUp));
 
-router.post("/signup",wrapAsync(userController.signUp));
-
-router.get("/login",userController.renderLoginForm);
-
-router.post("/login", saveRediectUrl,
+router.route("/login")
+.get(userController.renderLoginForm)
+.post(saveRediectUrl,
     passport.authenticate("local", {
     failureRedirect: "/login",
     failureFlash: true
