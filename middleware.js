@@ -19,13 +19,24 @@ module.exports.saveRediectUrl = (req,res,next) => {
     next();
 };
 
-module.exports.isOwner = (req,res,next) => {
-       let {id} = req.params;
-       let listing = Listing.findById(id);
-       if(!listing.owner._id.equals(res.locals.currUser._id)){
+module.exports.isOwner = async (req,res,next) => {
+    let {id} = req.params;
+
+    if (!id) {
+        return next();
+    }
+
+    let listing = await Listing.findById(id);
+    if (!listing) {
+        req.flash("error","Listing does not exist");
+        return res.redirect("/listings");
+    }
+
+    if (!listing.owner || !listing.owner._id.equals(res.locals.currUser._id)) {
         req.flash("error","you are not the owner of this listing");
         return res.redirect(`/listings/${id}`);
-       }
+    }
+
     next();
 };
 
