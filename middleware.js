@@ -32,7 +32,7 @@ module.exports.isOwner = async (req,res,next) => {
         return res.redirect("/listings");
     }
 
-    if (!listing.owner || !listing.owner._id.equals(res.locals.currUser._id)) {
+    if (!req.user || !listing.owner || listing.owner.toString() !== req.user._id.toString()) {
         req.flash("error","you are not the owner of this listing");
         return res.redirect(`/listings/${id}`);
     }
@@ -60,10 +60,14 @@ module.exports.validateReview = (req,res,next)=>{
     }   
 };
 
-module.exports.isReviewAuthor = (req,res,next) => {
+module.exports.isReviewAuthor = async (req,res,next) => {
        let { id, reviewId} = req.params;
-       let review = Review.findById(reviewId);
-       if(!review.author._id.equals(res.locals.currUser._id)){
+       let review = await Review.findById(reviewId);
+       if (!review) {
+        req.flash("error","Review not found");
+        return res.redirect(`/listings/${id}`);
+       }
+       if(!req.user || review.author.toString() !== req.user._id.toString()){
         req.flash("error","you are not the author of this review");
         return res.redirect(`/listings/${id}`);
        }

@@ -113,4 +113,5 @@ app.use((err,req,res,next)=>{
 
 app.listen(8080, ()=>{
     console.log("app is working");
+    //http://localhost:8080/listings
 });
